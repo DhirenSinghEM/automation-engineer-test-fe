@@ -65,7 +65,7 @@ jobs:
         continue-on-error: true
 
 
-        
+
       - name: Check test results
         if: steps.test-run.outcome == 'failure'
         run: exit 1
@@ -121,14 +121,7 @@ jobs:
               body: comment
             });
 
-      - name: Publish test summary
-        if: always()
-        uses: dorny/test-reporter@v1
-        with:
-          name: Playwright Test Results
-          path: 'test-results/junit.xml'
-          reporter: 'jest-junit'
-          fail-on-error: false
+
 
   publish-report:
     name: Publish Test Report to GitHub Pages

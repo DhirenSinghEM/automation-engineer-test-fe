@@ -12,7 +12,7 @@ test.describe('Auth State', () => {
         dashboardPage = new DashboardPage(page);
     });
 
-    test.only('logged-in session persists after page reload @smoke @regression', async ({ page }) => {
+    test('logged-in session persists after page reload @smoke @regression', async ({ page }) => {
         await loginPage.navigate();
         await loginPage.login(config.users.admin.email, config.users.admin.password);
         await expect(page).toHaveURL(/\/$/, { timeout: 10000 });
