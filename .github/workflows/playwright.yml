@@ -1,0 +1,155 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'tests/**'
+      - 'playwright.config.js'
+      - 'package.json'
+      - '.github/workflows/playwright.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'tests/**'
+      - 'playwright.config.js'
+      - 'package.json'
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Run Playwright Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    env:
+      BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL || 'https://automation-engineer-test-fe-ebon.vercel.app' }}
+      TEST_ADMIN_EMAIL: ${{ secrets.TEST_ADMIN_EMAIL }}
+      TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+      TEST_WORKER_EMAIL: ${{ secrets.TEST_WORKER_EMAIL }}
+      TEST_WORKER_PASSWORD: ${{ secrets.TEST_WORKER_PASSWORD }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Verify test configuration
+        run: |
+          echo "Base URL: ${{ env.BASE_URL }}"
+          echo "Admin Email: ${{ env.TEST_ADMIN_EMAIL }}"
+          echo "Config file exists: $(test -f playwright.config.js && echo 'yes' || echo 'no')"
+
+      - name: Run all tests
+        id: test-run
+        run: npm run test:e2e
+        continue-on-error: true
+
+      - name: Generate HTML report
+        if: always()
+        run: npm run test:e2e:report || true
+
+      - name: Check test results
+        if: steps.test-run.outcome == 'failure'
+        run: exit 1
+
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: playwright-report/
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Upload test traces
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-traces-${{ github.run_number }}
+          path: test-results/
+          retention-days: 7
+          if-no-files-found: ignore
+
+      - name: Comment PR with test results
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const outcome = '${{ steps.test-run.outcome }}';
+            const runNumber = '${{ github.run_number }}';
+            
+            let comment = `## 🎭 Playwright Test Results (Run #${runNumber})\n\n`;
+            
+            if (outcome === 'success') {
+              comment += '✅ **All tests passed!**\n\n';
+            } else {
+              comment += '❌ **Some tests failed**\n\n';
+            }
+            
+            comment += `### Artifacts\n`;
+            comment += `- 📊 [View Playwright Report](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})\n`;
+            comment += `- 📝 Check the "Artifacts" section for detailed HTML reports and traces\n\n`;
+            comment += `### Test Environment\n`;
+            comment += `- **Base URL**: ${{ env.BASE_URL }}\n`;
+            comment += `- **Node Version**: 18\n`;
+            comment += `- **Browser**: Chromium (via Playwright)\n`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Publish test summary
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Playwright Test Results
+          path: 'test-results/junit.xml'
+          reporter: 'jest-junit'
+          fail-on-error: false
+
+  publish-report:
+    name: Publish Test Report to GitHub Pages
+    needs: test
+    runs-on: ubuntu-latest
+    if: always() && github.ref == 'refs/heads/main'
+    permissions:
+      contents: write
+    
+    steps:
+      - name: Download report artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-report-${{ github.run_number }}
+          path: playwright-report
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./playwright-report
+          destination_dir: reports/${{ github.run_number }}
