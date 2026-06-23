@@ -19,7 +19,7 @@
     "grepInvert": null,
     "maxFailures": 0,
     "metadata": {
-      "actualWorkers": 2
+      "actualWorkers": 1
     },
     "preserveOutput": "always",
     "projects": [
@@ -28,7 +28,7 @@
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
-          "actualWorkers": 2
+          "actualWorkers": 1
         },
         "id": "chromium",
         "name": "chromium",
@@ -104,12 +104,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5522,
+                      "duration": 4857,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-06-20T23:25:03.661Z",
+                      "startTime": "2026-06-23T20:28:41.866Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -120,79 +120,7 @@
               "id": "fd3619a2f81e2dbd9806-33dda6324c4f55ee49ff",
               "file": "authState.spec.js",
               "line": 15,
-              "column": 5
-            },
-            {
-              "title": "unauthenticated user sees the login page, not the dashboard @regression",
-              "ok": true,
-              "tags": [
-                "regression"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 2989,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-20T23:25:03.605Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fd3619a2f81e2dbd9806-efab1fb459636213c92f",
-              "file": "authState.spec.js",
-              "line": 36,
-              "column": 5
-            },
-            {
-              "title": "user can logout and session is cleared @regression",
-              "ok": true,
-              "tags": [
-                "regression"
-              ],
-              "tests": [
-                {
-                  "timeout": 30000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "chromium",
-                  "projectName": "chromium",
-                  "results": [
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 1,
-                      "status": "passed",
-                      "duration": 3902,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-06-20T23:25:07.336Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "fd3619a2f81e2dbd9806-1153421b9eea3ebc893b",
-              "file": "authState.spec.js",
-              "line": 43,
-              "column": 5
+              "column": 10
             }
           ]
         }
@@ -201,9 +129,9 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-06-20T23:25:02.166Z",
-    "duration": 9707.832,
-    "expected": 3,
+    "startTime": "2026-06-23T20:28:40.765Z",
+    "duration": 7712.512,
+    "expected": 1,
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0
