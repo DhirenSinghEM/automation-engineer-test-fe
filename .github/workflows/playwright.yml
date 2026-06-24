@@ -121,13 +121,17 @@ jobs:
               body: comment
             });
 
-
+  debug-job:
+    name: Debug - Does this appear?
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "I exist!"  
 
   publish-report:
     name: Publish Test Report to GitHub Pages
     needs: test
     runs-on: ubuntu-latest
-    if: always()
+    if: always() && github.ref == 'refs/heads/main'
     permissions:
       contents: write
     
