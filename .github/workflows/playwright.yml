@@ -127,7 +127,7 @@ jobs:
     name: Publish Test Report to GitHub Pages
     needs: test
     runs-on: ubuntu-latest
-    if: always() && github.ref == 'refs/heads/main'
+    if: always()
     permissions:
       contents: write
     
