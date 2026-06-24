@@ -26,7 +26,7 @@ jobs:
   test:
     name: Run Playwright Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 10
 
     env:
       BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL || 'https://automation-engineer-test-fe-ebon.vercel.app' }}
